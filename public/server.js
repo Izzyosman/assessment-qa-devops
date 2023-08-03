@@ -1,8 +1,13 @@
 const express = require('express')
 const path = require('path')
 const app = express()
-const {bots, playerRecord} = require('./data')
-const {shuffleArray} = require('./utils')
+// const {bots, playerRecord} = require('./data')
+// const {shuffleArray} = require('./utils')
+const bots = require('../src/botsData');
+const playerRecord = {
+  wins: 0,
+  losses: 0,
+};
 
 // include and initialize the rollbar library with your access token
 var Rollbar = require('rollbar')
@@ -24,12 +29,12 @@ app.get('/',(req,res) => {
     res.sendFile(path.join(__dirname,'../public/index.html'))
 }) // end points
 
-app.get('/styles',(req,res) => {
-    res.sendFile(path.join(__dirname,'./public/index.css'))
+app.get('/styles.css',(req,res) => {
+  res.sendFile(path.join(__dirname,'../public/styles.css'))
 })
 
-app.get('/js',(req,res) => {
-    res.sendFile(path.join(__dirname,'./public/index.js'))
+app.get('/index.js',(req,res) => {
+    res.sendFile(path.join(__dirname,'../public/index.js'))
 })
 
 app.get('/api/robots', (req, res) => {
@@ -43,7 +48,8 @@ app.get('/api/robots', (req, res) => {
 
 app.get('/api/robots/five', (req, res) => {
     try {
-        let shuffled = shuffleArray(bots)
+        // let shuffled = shuffleArray(bots)
+        let shuffled = bots;
         let choices = shuffled.slice(0, 5)
         let compDuo = shuffled.slice(6, 8)
         res.status(200).send({choices, compDuo})
@@ -52,6 +58,17 @@ app.get('/api/robots/five', (req, res) => {
         res.sendStatus(400)
     }
 })
+
+app.get("/api/robots/shuffled", (req, res) => {
+  try {
+    // let shuffled = shuffle(bots);
+    let shuffled = bots;
+    res.status(200).send(shuffled);
+  } catch (error) {
+    console.error("ERROR GETTING SHUFFLED BOTS", error);
+    res.sendStatus(400);
+  }
+});
 
 app.post('/api/duel', (req, res) => {
     try {
@@ -75,7 +92,7 @@ app.post('/api/duel', (req, res) => {
             playerRecord.losses++
             res.status(200).send('You lost!')
         } else {
-            playerRecord.losses++
+            playerRecord.wins++
             res.status(200).send('You won!')
         }
     } catch (error) {
