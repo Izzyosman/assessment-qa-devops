@@ -1,8 +1,19 @@
-import { Builder, Capabilities, By } from "selenium-webdriver"
+const { Builder, Capabilities, By } = require("selenium-webdriver");
+require('chromedriver');
 
-require('chromedriver')
+const chromeOptions = {
+  'args': ['--headless'] // Optional: Add any Chrome options you need
+};
 
-const driver = new Builder().withCapabilities(Capabilities.chrome()).build()
+const chromeCapabilities = Capabilities.chrome();
+chromeCapabilities.set('chromeOptions', chromeOptions);
+
+// Set the path to the Chrome binary
+chromeCapabilities.set('chromeOptions', {
+  'binary': '/path/to/chrome/binary',
+});
+
+const driver = new Builder().withCapabilities(Capabilities.chrome()).build();
 
 beforeEach(async () => {
     driver.get('http://localhost:8000/')
